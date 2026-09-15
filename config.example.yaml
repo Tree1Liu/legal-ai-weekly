@@ -1,0 +1,548 @@
+# 复制为 config.yaml 后修改。密钥不要提交进仓库。
+
+timezone: "Asia/Shanghai"
+
+# 产品形态：weekly=法律AI周报（默认）；daily=保留原日报能力
+product_mode: weekly
+
+# 周报推送：每周五 17:00；覆盖上周五 17:00 至当前
+schedule:
+  hour: 17
+  minute: 0
+  friday_only: true
+  weekdays_only: false
+
+lookback_hours: 168
+replay_limit: 300
+
+dry_run: true
+auto_approve_in_dry_run: true
+
+paths:
+  data_dir: "data"
+  inbox_dir: "data/inbox"
+  saved_dir: "data/saved"
+  store_file: "data/items.jsonl"
+  digest_dir: "data/digests"
+  log_file: "data/run.log"
+  weekly_meta_file: "data/weekly_meta.json"
+
+weekly:
+  brand: "法律AI每周资讯"
+  audience: "面向两院法务及法务部负责人的AI法律合规前沿资讯；强调筛选、判断、转化，不替代正式法律意见"
+  # 测试期：右上角显示「测试期」，且不递增正式期号
+  test_issue: true
+  issue_label: "测试期"
+  # 法务关注点/行动建议对齐的职责表述
+  legal_duty: "以专业合规支撑两院业务安全高效创新；搭建法律风控体系、明确合规边界并跨部门把关；统筹合同全周期管理与制度合规审核；处理法律纠纷、维护两院合法权益；参与内控建设，推动合规-风险-业务协同优化，赋能组织战略与业务发展。"
+  two_institute_min_ratio: 0.5
+  # 不强制砍掉非两院内容，避免只剩单源
+  enforce_two_institute_ratio: false
+  # soft=排序；仍会剔除噪音与无关业务（drop_unrelated_business）
+  relevance_filter: soft
+  min_relevance_score: 1
+  # 丢掉与两院法务无关的纯业务资讯（保健食品、特种设备等）
+  drop_unrelated_business: true
+  # 两院栏硬筛：须命中科研/数据/民非/北京科技监管等核心信号；外事会见/政绩观学习等直接剔除
+  strict_two_institute: true
+  two_institute_min_score: 2
+  # 时间窗内：本轮采集 + 库内窗口条目汇总入刊（先过滤再限额）
+  include_window_all: true
+  window_item_limit: 300
+  max_items: 120
+  per_source_min: 4
+  per_source_max: 18
+  # 板块聚合：同类汇总 + 提炼标题（优先 LLM，失败则规则）
+  aggregate_sections: true
+  aggregate_min_items: 3
+  aggregate_max_per_section: 10
+  aggregate_input_limit: 36
+  section_limits:
+    global_ai: 30
+    legal_ai: 30
+    two_institute: 40
+  directions:
+    - AI监管与企业AI治理
+    - 合规风控与责任边界
+    - 合同管理与AI审查实践
+    - 垂类法律工具观察（MyLegalAI/法天使、元典、智合、豆包、扣子、WorkBuddy、Alpha）
+    - 数据合规及数据跨境
+    - 法务知识管理与数字化建设
+    - 法务AI落地案例与行业观察
+    - 人工智能与算法合规法规政策及热点案例
+    - 事业单位/新型研发机构政策动态
+  # 每周自动写入垂类工具观察快照到「法律AI」板块
+  legal_tools_snapshots: true
+
+# 两院在推项目关键词（用于快讯：新政策是否直接影响在推项目）
+active_project_keywords:
+  - 算法备案
+  - 生成式人工智能
+  - 数据跨境
+  - 大模型
+  - 智能体
+
+# 垂类法律工具观察清单（分类命中 + 每周快照；可增删）
+legal_tools_watchlist:
+  - id: mylegalai
+    name: MyLegalAI
+    vendor: 法天使
+    url: "https://www.mylegalai.cn/"
+    tags: ["法律AI", "合同", "垂类工具"]
+    note: "法天使 Legal AI；合同审查/起草等能力"
+  - id: fatian
+    name: 法天使
+    vendor: 法天使
+    url: "https://www.fatianshi.cn/"
+    tags: ["法律AI", "合同库", "垂类工具"]
+  - id: yuandian
+    name: 元典
+    vendor: 华宇元典
+    url: "https://open.chineselaw.com/"
+    home_url: "https://yuandian.ailaw.cn/YuandianThinkTank/index.html"
+    tags: ["法律AI", "检索", "API", "垂类工具"]
+  - id: zhihe
+    name: 智合
+    url: "https://www.zhihe.law/"
+    tags: ["法律AI", "办案", "垂类工具"]
+  - id: doubao
+    name: 豆包
+    vendor: 字节跳动
+    url: "https://www.doubao.com/"
+    tags: ["通用大模型", "法务应用", "垂类工具"]
+  - id: coze
+    name: 扣子
+    vendor: 字节跳动
+    url: "https://www.coze.cn/"
+    aliases: ["Coze"]
+    tags: ["Agent", "工作流", "垂类工具"]
+  - id: workbuddy
+    name: WorkBuddy
+    url: "https://www.workbuddy.ai/"
+    tags: ["办公AI", "法务提效", "垂类工具"]
+  - id: alpha
+    name: Alpha
+    url: "https://www.alphalawyer.cn/"
+    aliases: ["AIpha", "Alpha智能"]
+    tags: ["法律AI", "律师工具", "垂类工具"]
+
+quarterly:
+  months: 3
+
+# 详情页摘要（把「关键信息」写成 2～3 句）
+detail_enrich:
+  enabled: true
+  max_items: 25
+  pause_seconds: 0.35
+  timeout_seconds: 10
+
+# 延伸来源规则（命中关键词则写入条目）
+extended_sources:
+  - keywords: ["人工智能", "算法", "生成式", "智能体", "大模型"]
+    label: "网信办政策解读入口"
+    url: "https://www.cac.gov.cn/"
+  - keywords: ["数据", "数据局", "数据出境"]
+    label: "国家数据局公开信息"
+    url: "https://www.nda.gov.cn/"
+  - keywords: ["教育", "高校", "科研"]
+    label: "教育部公开信息"
+    url: "http://www.moe.gov.cn/"
+  - keywords: ["北京", "中关村", "科委"]
+    label: "北京市科委公开信息"
+    url: "https://kw.beijing.gov.cn/"
+
+impact_scenes:
+  - 科研合规
+  - IT与云服务
+  - 劳动人事
+  - 学生管理
+  - 知识产权
+  - 合规体系
+  - 事业单位监管
+  - 基金会与公益
+  - 数据合规
+  - AI监管
+  - 反垄断与反不正当竞争
+
+priority_tags:
+  - AI监管
+  - 数据合规
+  - 司法解释
+  - 行政执法
+  - 政策新规
+  - 科研合规
+  - 未成年人保护
+  - 知识产权
+  - 合同审查
+  - 合规体系
+  - 立法动态
+  - 典型案例
+
+accounts:
+  wechat_watchlist:
+    - name: 法治日报
+      strategy: mirror_site
+      mirror_source_id: legaldaily
+      notes: "对应官网 legaldaily.com.cn"
+    - name: 信通院/产业联盟/高校法务联盟
+      strategy: deferred
+      mirror_source_id: ""
+      notes: "行业源：合规投递至 data/inbox"
+    - name: 律所AI法律观察
+      strategy: deferred
+      mirror_source_id: ""
+      notes: "实践源：人工精选后写入 inbox"
+
+sources:
+  gov:
+    - id: npc_law
+      name: 中国人大网-立法
+      org: 中国人大网
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "http://www.npc.gov.cn/npc/c2/c183/"
+      parser: npc_law
+      limit: 40
+      pause_seconds: 1.2
+    - id: gov_cn_policy
+      name: 中国政府网-政策
+      org: 中国政府网
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.gov.cn/zhengce/"
+      parser: gov_cn_policy
+      limit: 40
+      pause_seconds: 1.2
+    - id: cac_news
+      name: 中央网信办
+      org: 国家网信办
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.cac.gov.cn/"
+      parser: generic_list
+      host_must: "cac.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: miit_zwgk
+      name: 工业和信息化部
+      org: 工信部
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.miit.gov.cn/"
+      parser: generic_list
+      host_must: "miit.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: nda_policy
+      name: 国家数据局
+      org: 国家数据局
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.nda.gov.cn/"
+      parser: generic_list
+      host_must: "nda.gov.cn"
+      title_min_len: 8
+      limit: 40
+      pause_seconds: 1.5
+    - id: moe_news
+      name: 教育部-公开
+      org: 教育部
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "http://www.moe.gov.cn/jyb_xwfb/gzdt_gzdt/"
+      parser: generic_list
+      host_must: "moe.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: mof_policy
+      name: 财政部-政策发布
+      org: 财政部
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.mof.gov.cn/zhengwuxinxi/zhengcefabu/"
+      parser: generic_list
+      host_must: "mof.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: ndrc_policy
+      name: 国家发改委-政策
+      org: 发改委
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.ndrc.gov.cn/"
+      parser: generic_list
+      host_must: "ndrc.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: samr_policy
+      name: 市场监管总局
+      org: 市场监管总局
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.samr.gov.cn/"
+      parser: generic_list
+      host_must: "samr.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: bjkw
+      name: 北京市科委
+      org: 北京市科委
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://kw.beijing.gov.cn/"
+      parser: generic_list
+      host_must: "beijing.gov.cn"
+      title_min_len: 10
+      limit: 40
+      pause_seconds: 1.5
+    - id: sac_news
+      name: 国家标准委
+      org: 国标委
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.sac.gov.cn/"
+      parser: generic_list
+      host_must: "sac.gov.cn"
+      title_min_len: 8
+      limit: 40
+      pause_seconds: 1.5
+    - id: legaldaily
+      name: 法治日报-官网
+      org: 法治日报
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "http://www.legaldaily.com.cn/"
+      parser: legaldaily
+      limit: 40
+      pause_seconds: 1.2
+      verify_ssl: false
+    - id: court_news
+      name: 最高法官网-资讯
+      org: 最高人民法院
+      tier: authority
+      enabled: true
+      mode: http
+      list_url: "https://www.court.gov.cn/zixun/gengduo/24.html"
+      parser: court_news
+      limit: 40
+      pause_seconds: 1.2
+  wechat:
+    - id: wechat_queue
+      name: 投递队列
+      enabled: false
+      mode: queue
+      rss_url: ""
+      watch_names: []
+    - id: wechat_inbox
+      name: 行业/实践源inbox
+      enabled: true
+      mode: inbox
+      watch_names:
+        - 法天使
+        - MyLegalAI
+        - 元典
+        - 智合
+        - 豆包
+        - 扣子
+        - WorkBuddy
+        - Alpha
+        - AIpha
+        - 法律科技
+    # 两院已购公众号库（内网）：GET /api/social-posts/wechat-mp
+    - id: wechat_purchased
+      name: 两院购入公众号库
+      enabled: false
+      mode: social_api
+      api_base: "http://10.1.132.21:8001"
+      api_path: "/api/social-posts/wechat-mp"
+      keyword: ""
+      category: ""
+      page_size: 50
+      max_pages: 6
+      limit: 80
+      timeout_seconds: 25
+      default_section: legal_ai
+      watch_names:
+        - 最高人民法院司法案例研究院
+        - 清华大学智能法治研究院
+        - 威科先行
+        - 北大法宝
+        - 金杜研究
+        - 无讼研究院
+        - 中伦视界
+        - 君合法律评论
+        - iCourt法秀
+        - 国家数据发展研究院
+  # 垂类法律工具公开页
+  legal_tools:
+    - id: mylegalai_portal
+      name: MyLegalAI 官网
+      enabled: true
+      mode: portal
+      list_url: "https://www.mylegalai.cn/"
+      default_section: legal_ai
+      limit: 8
+      pause_seconds: 0.8
+    - id: mylegalai_features
+      name: MyLegalAI 功能页
+      enabled: true
+      mode: portal
+      list_url: "https://www.mylegalai.cn/features"
+      default_section: legal_ai
+      limit: 6
+      pause_seconds: 0.8
+    - id: fatian_home
+      name: 法天使官网
+      enabled: true
+      mode: portal
+      list_url: "https://www.fatianshi.cn/"
+      default_section: legal_ai
+      limit: 8
+      pause_seconds: 0.8
+    - id: yuandian_open
+      name: 元典开放平台
+      enabled: true
+      mode: portal
+      list_url: "https://open.chineselaw.com/"
+      default_section: legal_ai
+      limit: 6
+      pause_seconds: 0.8
+  # 国内外 LLM 厂商与开源社区（公开 RSS，礼貌限速）
+  industry:
+    - id: openai_news
+      name: OpenAI News
+      enabled: true
+      mode: rss
+      rss_url: "https://openai.com/news/rss.xml"
+      default_section: global_ai
+      limit: 12
+      pause_seconds: 0.8
+      tags: ["LLM", "OpenAI"]
+    - id: anthropic_news
+      name: Anthropic News
+      enabled: true
+      mode: rss
+      rss_url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml"
+      default_section: global_ai
+      limit: 10
+      pause_seconds: 0.8
+      tags: ["LLM", "Anthropic"]
+    - id: huggingface_blog
+      name: Hugging Face Blog
+      enabled: true
+      mode: rss
+      rss_url: "https://huggingface.co/blog/feed.xml"
+      default_section: global_ai
+      limit: 12
+      pause_seconds: 0.8
+      tags: ["开源社区", "HuggingFace"]
+    - id: github_blog
+      name: GitHub Blog
+      enabled: true
+      mode: rss
+      rss_url: "https://github.blog/feed/"
+      default_section: global_ai
+      limit: 10
+      pause_seconds: 0.8
+      tags: ["开源社区", "GitHub"]
+    - id: google_deepmind
+      name: Google DeepMind Blog
+      enabled: true
+      mode: rss
+      rss_url: "https://deepmind.google/blog/rss.xml"
+      default_section: global_ai
+      limit: 10
+      pause_seconds: 0.8
+      tags: ["LLM", "DeepMind"]
+    - id: meta_ai_blog
+      name: Meta AI Blog
+      enabled: true
+      mode: rss
+      rss_url: "https://ai.meta.com/blog/rss/"
+      default_section: global_ai
+      limit: 8
+      pause_seconds: 0.8
+      tags: ["LLM", "Meta"]
+    - id: langchain_blog
+      name: LangChain Blog
+      enabled: true
+      mode: rss
+      rss_url: "https://blog.langchain.com/rss/"
+      default_section: legal_ai
+      limit: 8
+      pause_seconds: 0.8
+      tags: ["开源社区", "Agent"]
+    - id: pytorch_blog
+      name: PyTorch Blog
+      enabled: true
+      mode: rss
+      rss_url: "https://pytorch.org/blog/feed.xml"
+      default_section: global_ai
+      limit: 8
+      pause_seconds: 0.8
+      tags: ["开源社区", "PyTorch"]
+    - id: aliyun_dev
+      name: 阿里云开发者社区-人工智能
+      enabled: true
+      mode: rss
+      rss_url: "https://developer.aliyun.com/topic/ai/rss"
+      default_section: global_ai
+      limit: 10
+      pause_seconds: 1.0
+      tags: ["LLM", "国内"]
+    - id: infoq_ai
+      name: InfoQ-AI
+      enabled: true
+      mode: rss
+      rss_url: "https://www.infoq.cn/feed/ai"
+      default_section: global_ai
+      limit: 10
+      pause_seconds: 1.0
+      tags: ["LLM", "国内"]
+
+enrich:
+  mode: auto
+  summary_mode: auto
+  llm:
+    # 中关村研究院 LLM Hub（OpenAI 兼容）；密钥用环境变量 ZGC_KEY
+    api_base: "https://llm.zgci.org/hub/v1"
+    api_key_env: "ZGC_KEY"
+    api_key: ""
+    model: "qwen"
+    timeout_seconds: 90
+
+miniprogram:
+  api_url: ""
+  token_env: "MINIPROGRAM_PUSH_TOKEN"
+  timeout_seconds: 15
+
+dingtalk:
+  enabled: true
+  webhook: ""
+  webhook_env: "DINGTALK_WEBHOOK"
+  at_all: false
+  timeout_seconds: 15
+  note: "enabled+配置 webhook 后，非 dry_run 时推送 markdown；MD 可再粘贴到钉钉文档"
+
+fallback_email:
+  enabled: false
+  smtp_host: ""
+  to: ""

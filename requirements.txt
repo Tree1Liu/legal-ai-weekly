@@ -1,0 +1,6 @@
+pyyaml>=6.0
+requests>=2.31
+beautifulsoup4>=4.12
+feedparser>=6.0
+apscheduler>=3.10
+pycryptodome>=3.20

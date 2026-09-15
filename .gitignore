@@ -1,0 +1,35 @@
+# 密钥与本机配置（含钉钉 webhook，禁止入库）
+config.yaml
+env.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 运行产物（保留空目录占位）
+data/items.jsonl
+data/items.jsonl.bak*
+data/*.bak*
+data/run.log
+data/weekly_meta.json
+data/digests/**
+!data/digests/.gitkeep
+data/archive/**
+!data/archive/.gitkeep
+data/saved/**
+!data/saved/.gitkeep
+data/inbox/**
+!data/inbox/.gitkeep
+deploy/
+*.log
+
+# 缓存 / IDE
+.workbuddy/
+.cursor/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
